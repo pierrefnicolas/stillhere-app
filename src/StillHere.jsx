@@ -2060,6 +2060,7 @@ export default function StillHere() {
   const [sentMsg, setSentMsg]         = useState("");
   const [receiveStars, setReceiveStars] = useState([]);
   const [shootingStar, setShootingStar] = useState(null);
+  const [legalModal, setLegalModal]     = useState(null);
   const soundRef = useRef(null);
   const inId     = useRef(0);
   const dropRef  = useRef(null);
@@ -2593,10 +2594,73 @@ export default function StillHere() {
       </div>
 
       {/* FOOTER */}
-      <div style={{position:"fixed",bottom:"13px",left:0,right:0,textAlign:"center",zIndex:20,pointerEvents:"none",opacity:0,animation:"rise 3s ease 2s forwards"}}>
-        <div style={{fontFamily:"'Courier Prime',monospace",fontSize:"8.5px",letterSpacing:"0.17em",color:"rgba(255,200,120,0.08)",textTransform:"uppercase"}}>{ui.footer}</div>
-        <div style={{fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",fontSize:"11px",color:"rgba(255,200,120,0.07)",marginTop:"3px"}}>{ui.crisis}</div>
+      <div style={{position:"fixed",bottom:"13px",left:0,right:0,textAlign:"center",zIndex:20,opacity:0,animation:"rise 3s ease 2s forwards"}}>
+        <div style={{pointerEvents:"none",fontFamily:"'Courier Prime',monospace",fontSize:"8.5px",letterSpacing:"0.17em",color:"rgba(255,200,120,0.08)",textTransform:"uppercase"}}>{ui.footer}</div>
+        <div style={{pointerEvents:"none",fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",fontSize:"11px",color:"rgba(255,200,120,0.07)",marginTop:"3px"}}>{ui.crisis}</div>
+        <div style={{marginTop:"8px",display:"flex",justifyContent:"center",gap:"16px"}}>
+          <button onClick={()=>setLegalModal("mentions")} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"'Courier Prime',monospace",fontSize:"8px",letterSpacing:"0.12em",color:"rgba(255,200,120,0.18)",textTransform:"uppercase",textDecoration:"underline",padding:0}}>mentions légales</button>
+          <button onClick={()=>setLegalModal("privacy")} style={{background:"none",border:"none",cursor:"pointer",fontFamily:"'Courier Prime',monospace",fontSize:"8px",letterSpacing:"0.12em",color:"rgba(255,200,120,0.18)",textTransform:"uppercase",textDecoration:"underline",padding:0}}>confidentialité</button>
+        </div>
       </div>
+
+      {/* LEGAL MODAL */}
+      {legalModal && (
+        <div onClick={()=>setLegalModal(null)} style={{position:"fixed",inset:0,zIndex:1000,background:"rgba(5,3,12,0.92)",display:"flex",alignItems:"center",justifyContent:"center",padding:"20px",backdropFilter:"blur(8px)"}}>
+          <div onClick={e=>e.stopPropagation()} style={{background:"rgba(12,8,24,0.98)",border:"1px solid rgba(255,200,120,0.12)",borderRadius:"16px",maxWidth:"560px",width:"100%",maxHeight:"80vh",overflowY:"auto",padding:"36px",position:"relative"}}>
+            <button onClick={()=>setLegalModal(null)} style={{position:"absolute",top:"16px",right:"20px",background:"none",border:"none",cursor:"pointer",color:"rgba(255,200,120,0.4)",fontSize:"20px",lineHeight:1}}>✕</button>
+
+            {legalModal === "mentions" && (
+              <div style={{fontFamily:"'Cormorant Garamond',serif",color:"rgba(255,200,120,0.75)",lineHeight:1.8}}>
+                <h2 style={{fontFamily:"'Courier Prime',monospace",fontSize:"11px",letterSpacing:"0.2em",textTransform:"uppercase",color:"rgba(255,200,120,0.4)",marginBottom:"28px"}}>Mentions légales</h2>
+
+                <h3 style={{fontSize:"13px",fontFamily:"'Courier Prime',monospace",letterSpacing:"0.1em",color:"rgba(255,200,120,0.5)",marginBottom:"8px",marginTop:"24px"}}>ÉDITEUR DU SITE</h3>
+                <p style={{fontSize:"15px",color:"rgba(255,200,120,0.6)"}}>Ce site est édité à titre personnel, sans activité commerciale.</p>
+                <p style={{fontSize:"15px",color:"rgba(255,200,120,0.6)",marginTop:"6px"}}>Contact : <a href="mailto:contact@stillhereworld.com" style={{color:"rgba(255,200,120,0.5)"}}>contact@stillhereworld.com</a></p>
+
+                <h3 style={{fontSize:"13px",fontFamily:"'Courier Prime',monospace",letterSpacing:"0.1em",color:"rgba(255,200,120,0.5)",marginBottom:"8px",marginTop:"24px"}}>HÉBERGEMENT</h3>
+                <p style={{fontSize:"15px",color:"rgba(255,200,120,0.6)"}}>Vercel Inc.<br/>340 Pine Street, Suite 701<br/>San Francisco, CA 94104, USA<br/><a href="https://vercel.com" target="_blank" rel="noopener noreferrer" style={{color:"rgba(255,200,120,0.5)"}}>vercel.com</a></p>
+
+                <h3 style={{fontSize:"13px",fontFamily:"'Courier Prime',monospace",letterSpacing:"0.1em",color:"rgba(255,200,120,0.5)",marginBottom:"8px",marginTop:"24px"}}>OBJET DU SITE</h3>
+                <p style={{fontSize:"15px",color:"rgba(255,200,120,0.6)"}}>StillHere est un espace anonyme et gratuit permettant à toute personne d'envoyer et recevoir des messages de bienveillance à travers le monde. Aucun compte utilisateur n'est requis.</p>
+
+                <h3 style={{fontSize:"13px",fontFamily:"'Courier Prime',monospace",letterSpacing:"0.1em",color:"rgba(255,200,120,0.5)",marginBottom:"8px",marginTop:"24px"}}>MODÉRATION</h3>
+                <p style={{fontSize:"15px",color:"rgba(255,200,120,0.6)"}}>Les messages soumis par les utilisateurs sont filtrés automatiquement. L'éditeur se réserve le droit de supprimer tout contenu inapproprié sans préavis. Tout contenu haineux, discriminatoire ou portant atteinte à la dignité humaine est strictement interdit.</p>
+
+                <h3 style={{fontSize:"13px",fontFamily:"'Courier Prime',monospace",letterSpacing:"0.1em",color:"rgba(255,200,120,0.5)",marginBottom:"8px",marginTop:"24px"}}>PROPRIÉTÉ INTELLECTUELLE</h3>
+                <p style={{fontSize:"15px",color:"rgba(255,200,120,0.6)"}}>L'ensemble du site (design, code, textes pré-rédigés) est la propriété de l'éditeur. Toute reproduction sans autorisation est interdite.</p>
+
+                <p style={{fontSize:"12px",color:"rgba(255,200,120,0.25)",marginTop:"32px",fontFamily:"'Courier Prime',monospace",letterSpacing:"0.08em"}}>Dernière mise à jour : février 2026</p>
+              </div>
+            )}
+
+            {legalModal === "privacy" && (
+              <div style={{fontFamily:"'Cormorant Garamond',serif",color:"rgba(255,200,120,0.75)",lineHeight:1.8}}>
+                <h2 style={{fontFamily:"'Courier Prime',monospace",fontSize:"11px",letterSpacing:"0.2em",textTransform:"uppercase",color:"rgba(255,200,120,0.4)",marginBottom:"28px"}}>Politique de confidentialité</h2>
+
+                <h3 style={{fontSize:"13px",fontFamily:"'Courier Prime',monospace",letterSpacing:"0.1em",color:"rgba(255,200,120,0.5)",marginBottom:"8px",marginTop:"24px"}}>DONNÉES COLLECTÉES</h3>
+                <p style={{fontSize:"15px",color:"rgba(255,200,120,0.6)"}}>StillHere ne collecte <strong style={{color:"rgba(255,200,120,0.8)"}}>aucune donnée personnelle</strong>. Aucun nom, prénom, adresse email, numéro de téléphone ou toute autre information permettant d'identifier un utilisateur n'est requis ni enregistré.</p>
+
+                <h3 style={{fontSize:"13px",fontFamily:"'Courier Prime',monospace",letterSpacing:"0.1em",color:"rgba(255,200,120,0.5)",marginBottom:"8px",marginTop:"24px"}}>COOKIES</h3>
+                <p style={{fontSize:"15px",color:"rgba(255,200,120,0.6)"}}>Ce site n'utilise <strong style={{color:"rgba(255,200,120,0.8)"}}>aucun cookie de tracking</strong>, publicitaire ou analytique. Aucun consentement n'est requis. Les seuls cookies techniques présents sont ceux strictement nécessaires au fonctionnement de l'hébergeur Vercel.</p>
+
+                <h3 style={{fontSize:"13px",fontFamily:"'Courier Prime',monospace",letterSpacing:"0.1em",color:"rgba(255,200,120,0.5)",marginBottom:"8px",marginTop:"24px"}}>MESSAGES ANONYMES</h3>
+                <p style={{fontSize:"15px",color:"rgba(255,200,120,0.6)"}}>Les messages envoyés via StillHere sont entièrement anonymes. Aucune donnée permettant d'identifier l'expéditeur n'est conservée. Les messages peuvent être conservés pour permettre le fonctionnement du service et sont susceptibles d'être supprimés à tout moment.</p>
+
+                <h3 style={{fontSize:"13px",fontFamily:"'Courier Prime',monospace",letterSpacing:"0.1em",color:"rgba(255,200,120,0.5)",marginBottom:"8px",marginTop:"24px"}}>DONNÉES TECHNIQUES</h3>
+                <p style={{fontSize:"15px",color:"rgba(255,200,120,0.6)"}}>Des données techniques anonymes (pays de connexion, type d'appareil, pages visitées) peuvent être collectées par l'hébergeur Vercel à des fins de performance et de sécurité, conformément à leur propre politique de confidentialité.</p>
+
+                <h3 style={{fontSize:"13px",fontFamily:"'Courier Prime',monospace",letterSpacing:"0.1em",color:"rgba(255,200,120,0.5)",marginBottom:"8px",marginTop:"24px"}}>VOS DROITS (RGPD)</h3>
+                <p style={{fontSize:"15px",color:"rgba(255,200,120,0.6)"}}>En l'absence de collecte de données personnelles, les droits d'accès, rectification et suppression prévus par le RGPD ne s'appliquent pas. Pour toute question : <a href="mailto:contact@stillhereworld.com" style={{color:"rgba(255,200,120,0.5)"}}>contact@stillhereworld.com</a></p>
+
+                <h3 style={{fontSize:"13px",fontFamily:"'Courier Prime',monospace",letterSpacing:"0.1em",color:"rgba(255,200,120,0.5)",marginBottom:"8px",marginTop:"24px"}}>MINEURS</h3>
+                <p style={{fontSize:"15px",color:"rgba(255,200,120,0.6)"}}>StillHere ne collectant aucune donnée personnelle, il n'existe pas de restriction d'âge technique. Les contenus du site sont conçus pour être bienveillants et accessibles à tous.</p>
+
+                <p style={{fontSize:"12px",color:"rgba(255,200,120,0.25)",marginTop:"32px",fontFamily:"'Courier Prime',monospace",letterSpacing:"0.08em"}}>Dernière mise à jour : février 2026</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
