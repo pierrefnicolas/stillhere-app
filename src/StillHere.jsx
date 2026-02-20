@@ -1,6 +1,52 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
 // ══════════════════════════════════════════════════
+// SUPABASE — real messages between users
+// ══════════════════════════════════════════════════
+const SUPA_URL = "https://ibwfjjtrrrebrhauzdglu.supabase.co";
+const SUPA_KEY = "sb_publishable_Rh7onuV0eEP0dk65qXj7mg_xhkfctpZ";
+
+const supaFetch = async (path, options = {}) => {
+  const res = await fetch(`${SUPA_URL}/rest/v1${path}`, {
+    headers: {
+      "apikey": SUPA_KEY,
+      "Authorization": `Bearer ${SUPA_KEY}`,
+      "Content-Type": "application/json",
+      "Prefer": options.prefer || "",
+      ...options.headers,
+    },
+    ...options,
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+};
+
+const saveMessage = async ({ text, country, lang }) => {
+  // Basic moderation — block if too short, too long, or contains obvious slurs
+  if (!text || text.length < 2 || text.length > 200) return;
+  const blocked = ["hate","kill","die","fuck","shit","nazi","nigger","faggot"];
+  if (blocked.some(w => text.toLowerCase().includes(w))) return;
+  await supaFetch("/messages", {
+    method: "POST",
+    prefer: "return=minimal",
+    body: JSON.stringify({ text, country, lang }),
+  });
+};
+
+const loadMessages = async (lang) => {
+  try {
+    const rows = await supaFetch(
+      `/messages?select=text,country,lang&flagged=eq.false&order=created_at.desc&limit=60`
+    );
+    if (!rows?.length) return [];
+    const samelang = rows.filter(r => r.lang === lang);
+    return (samelang.length >= 3 ? samelang : rows)
+      .sort(() => Math.random() - 0.5);
+  } catch(e) { return []; }
+};
+
+// ══════════════════════════════════════════════════
 // SOUND — ambient drone, very quiet
 // ══════════════════════════════════════════════════
 
@@ -2149,26 +2195,11 @@ export default function StillHere() {
     let queue = [];
     let realPool = []; // filled from shared storage
 
-    // Load real messages sent by other users
+    // Load real messages sent by other users from Supabase
     const loadRealMessages = async () => {
       try {
-        const result = await window.storage.list("msg:", true);
-        if (!result?.keys?.length) return;
-        const recent = result.keys.slice(-60); // last 60 real messages
-        const loaded = await Promise.all(
-          recent.map(async (k) => {
-            try {
-              const r = await window.storage.get(k, true);
-              return r ? JSON.parse(r.value) : null;
-            } catch(e) { return null; }
-          })
-        );
-        // Only show messages in the user's language, or if very few, show all
-        const filtered = loaded.filter(m => m && m.text);
-        const samelang = filtered.filter(m => m.lang === lang);
-        realPool = (samelang.length >= 3 ? samelang : filtered)
-          .sort(() => Math.random() - 0.5);
-      } catch(e) {}
+        realPool = await loadMessages(lang);
+      } catch(e) { realPool = []; }
     };
     loadRealMessages();
 
@@ -2176,7 +2207,7 @@ export default function StillHere() {
       // 30% chance: show a real user message if available
       if (realPool.length > 0 && Math.random() < 0.30) {
         const item = realPool[Math.floor(Math.random() * realPool.length)];
-        return { text: item.text, from: item.from, real: true };
+        return { text: item.text, from: item.country || item.from, real: true };
       }
       // Otherwise curated shuffle queue
       if (queue.length === 0) {
@@ -2263,15 +2294,9 @@ export default function StillHere() {
     triggerShootingStar();
     setSentCountry(countryChosen); setSentMsg(chosenMsg);
     setCounter(n => n + 1); setScreen("sent");
-    // Save to shared pool so other users can receive this real message
+    // Save to Supabase so other users can receive this real message
     try {
-      const key = "msg:" + Date.now() + ":" + Math.random().toString(36).slice(2,7);
-      await window.storage.set(key, JSON.stringify({
-        text: chosenMsg,
-        from: countryChosen,
-        lang,
-        ts: Date.now(),
-      }), true);
+      await saveMessage({ text: chosenMsg, country: countryChosen, lang });
     } catch(e) {}
     setCountrySearch(""); setCountryChosen(""); setChosenMsg(null); setGiveStep(1);
   };
