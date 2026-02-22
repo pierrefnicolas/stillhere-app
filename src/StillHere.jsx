@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 // SUPABASE — real messages between users
 // ══════════════════════════════════════════════════
 const SUPA_URL = "https://ibwfjjtrrrebrhauzdglu.supabase.co";
-const SUPA_KEY = "sb_publishable_Rh7onuV0eEP0dk65qXj7mg_xhkfctpZ";
+const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlid2ZqanRycmVicmhhdXpkZ2x1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2MDEwNTksImV4cCI6MjA4NzE3NzA1OX0.Kv2SJfHx5hGG3ZHPRJ4WlV2t_wZBxP3gYCDgRq-0jeE";
 
 const supaFetch = async (path, options = {}) => {
   const res = await fetch(`${SUPA_URL}/rest/v1${path}`, {
