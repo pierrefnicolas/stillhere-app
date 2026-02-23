@@ -2295,10 +2295,22 @@ export default function StillHere() {
     setSentCountry(countryChosen); setSentMsg(chosenMsg);
     setCounter(n => n + 1); setScreen("sent");
     // Save to Supabase so other users can receive this real message
-    try {
-      await saveMessage({ text: chosenMsg, country: countryChosen, lang });
-    } catch(e) {}
+    const msgText = chosenMsg;
+    const msgCountry = countryChosen;
+    const msgLang = lang;
     setCountrySearch(""); setCountryChosen(""); setChosenMsg(null); setGiveStep(1);
+    try {
+      await fetch(`${SUPA_URL}/rest/v1/messages`, {
+        method: "POST",
+        headers: {
+          "apikey": SUPA_KEY,
+          "Authorization": `Bearer ${SUPA_KEY}`,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal",
+        },
+        body: JSON.stringify({ text: msgText, country: msgCountry, lang: msgLang }),
+      });
+    } catch(e) { console.error("Supabase save error:", e); }
   };
 
   const goGive    = () => { setGiveStep(1); setCountrySearch(""); setCountryChosen(""); setChosenMsg(null); setScreen("give"); };
